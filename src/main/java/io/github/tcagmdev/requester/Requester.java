@@ -10,19 +10,15 @@ public class Requester {
         return request.send();
     }
 
-    public static CompletableFuture<Response> request(Function<Request, Request> builder) throws IOException {
-        return request(builder.apply(new Request()));
+    public static CompletableFuture<Response> request(Function<RequestBuilder, RequestBuilder> optionsApplier) throws IOException {
+        return request(optionsApplier.apply(new RequestBuilder()).build());
     }
 
-    public static CompletableFuture<Response> request(Request.Method method, Function<Request, Request> builder) throws IOException {
-        return request(builder.apply(new Request().setMethod(method)));
+    public static CompletableFuture<Response> request(String url, Request.Method method, Function<RequestBuilder, RequestBuilder> optionsApplier) throws IOException {
+        return request(optionsApplier.apply(new RequestBuilder().setURI(url).setMethod(method)).build());
     }
-
-    public static CompletableFuture<Response> request(String url, Request.Method method, Function<Request, Request> builder) throws IOException {
-        return request(builder.apply(new Request(url, method)));
-    }
-    public static CompletableFuture<Response> request(URI url, Request.Method method, Function<Request, Request> builder) throws IOException {
-        return request(builder.apply(new Request(url, method)));
+    public static CompletableFuture<Response> request(URI url, Request.Method method, Function<RequestBuilder, RequestBuilder> optionsApplier) throws IOException {
+        return request(optionsApplier.apply(new RequestBuilder().setURI(url).setMethod(method)).build());
     }
 
     public static CompletableFuture<Response> get(String url) throws IOException {
@@ -32,11 +28,11 @@ public class Requester {
         return request(url, Request.Method.GET, r -> r);
     }
 
-    public static CompletableFuture<Response> get(String url, Function<Request, Request> builder) throws IOException {
-        return request(url, Request.Method.GET, builder);
+    public static CompletableFuture<Response> get(String url, Function<RequestBuilder, RequestBuilder> optionsApplier) throws IOException {
+        return request(url, Request.Method.GET, optionsApplier);
     }
-    public static CompletableFuture<Response> get(URI url, Function<Request, Request> builder) throws IOException {
-        return request(url, Request.Method.GET, builder);
+    public static CompletableFuture<Response> get(URI url, Function<RequestBuilder, RequestBuilder> optionsApplier) throws IOException {
+        return request(url, Request.Method.GET, optionsApplier);
     }
 
     public static CompletableFuture<Response> post(String url, ContentProvider content) throws IOException {
@@ -46,11 +42,11 @@ public class Requester {
         return request(url, Request.Method.POST, r -> r.setContent(content));
     }
 
-    public static CompletableFuture<Response> post(String url, ContentProvider content, Function<Request, Request> builder) throws IOException {
-        return request(url, Request.Method.POST, r -> builder.apply(r.setContent(content)));
+    public static CompletableFuture<Response> post(String url, ContentProvider content, Function<RequestBuilder, RequestBuilder> optionsApplier) throws IOException {
+        return request(url, Request.Method.POST, r -> optionsApplier.apply(r.setContent(content)));
     }
-    public static CompletableFuture<Response> post(URI url, ContentProvider content, Function<Request, Request> builder) throws IOException {
-        return request(url, Request.Method.POST, r -> builder.apply(r.setContent(content)));
+    public static CompletableFuture<Response> post(URI url, ContentProvider content, Function<RequestBuilder, RequestBuilder> optionsApplier) throws IOException {
+        return request(url, Request.Method.POST, r -> optionsApplier.apply(r.setContent(content)));
     }
 
     public static CompletableFuture<Response> ping(String url) throws IOException {

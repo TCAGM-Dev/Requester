@@ -3,7 +3,6 @@ package io.github.tcagmdev.requester;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URLConnection;
 
 public class StreamContentProvider implements ContentProvider {
     private final InputStream stream;
