@@ -1,6 +1,5 @@
 package io.github.tcagmdev.requester;
 
-import javax.naming.OperationNotSupportedException;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.util.*;
