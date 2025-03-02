@@ -1,0 +1,9 @@
+{
+  "object": {
+    "text": "Hello!\nLet's test this java library :)\n\ndouble line breaks should work",
+    "number": 5897843
+  },
+  "boolean": false,
+  "otherboolean": true,
+  "array": ["Lorem ipsum", true, 69420]
+}
