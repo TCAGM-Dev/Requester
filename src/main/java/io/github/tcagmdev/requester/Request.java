@@ -55,6 +55,12 @@ public class Request {
 
         connection.setInstanceFollowRedirects(this.shouldFollowRedirects);
 
+        try {
+            connection.connect();
+        } catch (ConnectException e) {
+            throw new IOException("Connection refused; host not reachable", e);
+        }
+
         if ((this.method == Method.POST || this.method == Method.PUT) && this.content != null) {
             connection.setDoOutput(true);
 
@@ -64,8 +70,6 @@ public class Request {
             DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
             this.content.provide(outputStream);
         }
-
-        connection.connect();
 
         return CompletableFuture.supplyAsync(() -> {
             try {
