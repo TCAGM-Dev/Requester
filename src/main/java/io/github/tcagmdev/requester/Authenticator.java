@@ -1,5 +1,7 @@
 package io.github.tcagmdev.requester;
 
+import java.util.Map;
+
 public interface Authenticator {
-    void apply(Request request);
+    void apply(Map<String, String> headers);
 }

@@ -18,67 +18,22 @@ public class Request {
         TRACE
     }
 
-    private URI uri;
-    protected Method method;
-    private final Map<String, String> headers = new HashMap<>();
-    private final Map<String, String> queryParams = new HashMap<>();
-    private Authenticator authenticator;
-    private ContentProvider content;
-    private boolean shouldFollowRedirects = true;
+    private final URI uri;
+    protected final Method method;
+    private final Map<String, String> headers;
+    private final Map<String, String> queryParams;
+    private final Authenticator authenticator;
+    private final ContentProvider content;
+    private final boolean shouldFollowRedirects;
 
-    public Request() {};
-    public Request(String uri, Method method) {
-        this.setURI(uri).setMethod(method);
-    }
-    public Request(URI uri, Method method) {
-        this.setURI(uri).setMethod(method);
-    }
-
-    public Request setMethod(Method method) {
-        if (this.method != null) throw new IllegalStateException("Cannot change the method of a request if it has already been set");
-        this.method = method;
-        return this;
-    }
-
-    public Request setURI(String uri) {
-        try {
-            return this.setURI(URI.create(uri));
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException(e);
-        }
-    }
-    public Request setURI(URI uri) {
-        if (this.uri != null) throw new IllegalStateException("Cannot change the target url of a request if it has already been set");
-        return this.replaceURI(uri);
-    }
-    private Request replaceURI(URI uri) {
-        if (uri.getQuery() != null) throw new IllegalArgumentException("Query parameters are not allowed when assigning a request URI, use Request.setQueryParam(String key, String value)");
-        this.uri = uri;
-        return this;
-    }
-
-    public Request setHeader(String key, String value) {
-        this.headers.put(key.toLowerCase(), value);
-        return this;
-    }
-    public Request setQueryParam(String key, String value) {
-        this.queryParams.put(key, value);
-        return this;
-    }
-
-    public Request setAuth(Authenticator authenticator) {
-        this.authenticator = authenticator;
-        return this;
-    }
-
-    public Request setContent(ContentProvider provider) {
-        this.content = provider;
-        return this;
-    }
-
-    public Request setFollowRedirects(boolean enabled) {
-        this.shouldFollowRedirects = enabled;
-        return this;
+    protected Request(RequestBuilder builder) {
+        this.uri = builder.uri;
+        this.method = builder.method;
+        this.headers = new HashMap<>(builder.headers);
+        this.queryParams = new HashMap<>(builder.queryParams);
+        this.authenticator = builder.authenticator;
+        this.content = builder.content;
+        this.shouldFollowRedirects = builder.shouldFollowRedirects;
     }
 
     protected CompletableFuture<Response> send() throws IOException {
@@ -90,7 +45,7 @@ public class Request {
 
         connection.setRequestMethod(this.method.name());
 
-        if (this.authenticator != null) this.authenticator.apply(this);
+        if (this.authenticator != null) this.authenticator.apply(this.headers);
 
         for (Map.Entry<String, String> headerEntry : this.headers.entrySet()) {
             connection.setRequestProperty(headerEntry.getKey(), headerEntry.getValue());
