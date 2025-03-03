@@ -58,7 +58,7 @@ public class Request {
         try {
             connection.connect();
         } catch (ConnectException e) {
-            throw new IOException("Connection refused, URL not reachable", e);
+            throw new IOException("Connection refused; host not reachable", e);
         }
 
         if ((this.method == Method.POST || this.method == Method.PUT) && this.content != null) {
