@@ -39,7 +39,7 @@ public class Request {
     protected CompletableFuture<Response> send() throws IOException {
         URI targetUri = this.queryParams.isEmpty() ? this.uri :
             this.uri.resolve("./?" + String.join("&", this.queryParams.entrySet().stream().map(entry ->
-                entry.getKey() + "=" + URIComponentHelper.encode(entry.getValue())
+                URIComponentHelper.encode(entry.getKey()) + "=" + URIComponentHelper.encode(entry.getValue())
             ).toList()));
         HttpURLConnection connection = (HttpURLConnection) targetUri.toURL().openConnection();
 

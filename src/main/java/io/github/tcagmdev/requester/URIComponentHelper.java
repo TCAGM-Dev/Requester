@@ -12,10 +12,44 @@ public abstract class URIComponentHelper {
         return result;
     }
 
+    public static String[] splitStringByLength(String string, int length) {
+        boolean backwards = length < 0;
+        if (backwards) length = -length;
+
+        String[] result = new String[Math.ceilDiv(string.length(), length)];
+        if (backwards) {
+            int i = result.length - 1;
+            for (int pos = string.length() - length; pos > -length; pos -= length) {
+                result[i--] = string.substring(Math.max(pos, 0), pos + length);
+            }
+        } else {
+            int i = 0;
+            for (int pos = 0; pos < string.length(); pos += length) {
+                result[i++] = string.substring(pos, Math.min(pos + length, string.length()));
+            }
+        }
+
+        return result;
+    }
+
     private static final Set<Character> SAFE_CHARACTERS = characterSet("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.!~*'()");
 
     public static String encodeCharacter(char c) {
-        return "%" + Integer.toString(Character.valueOf(c).hashCode(), 16);
+        int codepoint = Character.valueOf(c).hashCode();
+
+        String bytesText = Integer.toString(codepoint, 16).toUpperCase();
+
+        StringBuilder result = new StringBuilder();
+
+        for (String byteText : splitStringByLength(bytesText, -2)) {
+			StringBuilder byteTextBuilder = new StringBuilder(byteText);
+
+			while (byteTextBuilder.length() < 2) byteTextBuilder.insert(0, '0');
+
+			result.append('%').append(byteTextBuilder);
+        }
+
+        return result.toString();
     }
 
     public static String encode(String input) {
