@@ -54,6 +54,20 @@ public class Response {
         this.consumeChunks(consumer, 32);
     }
 
+    public void consumeLines(Consumer<String> consumer) throws IOException {
+        StringBuilder responseBuilder = new StringBuilder();
+
+        this.consumeChunks(chunk -> {
+            responseBuilder.append(chunk);
+
+            int newLineIndex = responseBuilder.indexOf("\n");
+            if (newLineIndex >= 0) {
+                consumer.accept(responseBuilder.substring(0, newLineIndex));
+                responseBuilder.delete(0, newLineIndex + 1);
+            }
+        });
+    }
+
     public CompletableFuture<byte[]> data() {
         if (this.request.method == Request.Method.HEAD) return CompletableFuture.completedFuture(new byte[0]);
         return CompletableFuture.supplyAsync(() -> {
