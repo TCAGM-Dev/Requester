@@ -65,19 +65,17 @@ public class Request {
         connection.setInstanceFollowRedirects(this.shouldFollowRedirects);
 
         try {
-            connection.connect();
+            if ((this.method == Method.POST || this.method == Method.PUT) && this.content != null) {
+                connection.setDoOutput(true);
+
+                connection.setRequestProperty("Content-Length", Long.toString(this.content.getLength()));
+                connection.setRequestProperty("Content-Type", this.content.getMIMEType());
+
+                DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
+                this.content.provide(outputStream);
+            } else connection.connect();
         } catch (ConnectException e) {
             throw new IOException("Connection refused; host not reachable", e);
-        }
-
-        if ((this.method == Method.POST || this.method == Method.PUT) && this.content != null) {
-            connection.setDoOutput(true);
-
-            connection.setRequestProperty("Content-Length", Long.toString(this.content.getLength()));
-            connection.setRequestProperty("Content-Type", this.content.getMIMEType());
-
-            DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
-            this.content.provide(outputStream);
         }
 
         return CompletableFuture.supplyAsync(() -> {
