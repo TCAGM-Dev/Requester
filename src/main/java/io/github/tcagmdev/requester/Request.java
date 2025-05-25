@@ -36,11 +36,20 @@ public class Request {
         this.shouldFollowRedirects = builder.shouldFollowRedirects;
     }
 
+    private static URI appendQuery(URI uri, String appendQuery) throws URISyntaxException {
+        return new URI(uri.getScheme(), uri.getAuthority(), uri.getPath(), uri.getQuery() == null ? appendQuery : uri.getQuery() + "&" + appendQuery, uri.getFragment());
+    }
+
     protected CompletableFuture<Response> send() throws IOException {
-        URI targetUri = this.queryParams.isEmpty() ? this.uri :
-            this.uri.resolve("./?" + String.join("&", this.queryParams.entrySet().stream().map(entry ->
-                URIComponentHelper.encode(entry.getKey()) + "=" + URIComponentHelper.encode(entry.getValue())
-            ).toList()));
+        URI targetUri = this.uri;
+        for (Map.Entry<String, String> entry : this.queryParams.entrySet()) {
+            try {
+                targetUri = appendQuery(targetUri, URIComponentHelper.encode(entry.getKey()) + "=" + URIComponentHelper.encode(entry.getValue()));
+            } catch (URISyntaxException e) {
+                throw new AssertionError("This should never happen");
+            }
+        }
+
         HttpURLConnection connection = (HttpURLConnection) targetUri.toURL().openConnection();
 
         connection.setRequestMethod(this.method.name());
