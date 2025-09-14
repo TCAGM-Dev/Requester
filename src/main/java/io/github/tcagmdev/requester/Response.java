@@ -2,6 +2,7 @@ package io.github.tcagmdev.requester;
 
 import java.io.*;
 import java.net.HttpURLConnection;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
@@ -125,11 +126,9 @@ public class Response {
             return stringBuilder.toString();
         });
     }
-    public CompletableFuture<File> download(String path) {
+    public CompletableFuture<File> download(File file) {
         if (this.request.method == Request.Method.HEAD) return CompletableFuture.completedFuture(null);
         return CompletableFuture.supplyAsync(() -> {
-            File file = new File(path);
-
             try {
                 FileOutputStream fileOutputStream = new FileOutputStream(file);
 
@@ -141,5 +140,11 @@ public class Response {
                 throw new RuntimeException(e);
             }
         });
+    }
+    public CompletableFuture<File> download(Path path) {
+        return this.download(path.toFile());
+    }
+    public CompletableFuture<File> download(String path) {
+        return this.download(new File(path));
     }
 }
