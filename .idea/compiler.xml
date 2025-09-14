@@ -11,6 +11,7 @@
         <sourceOutputDir name="out/generated-sources/annotations" />
         <sourceTestOutputDir name="out/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="requester" />
         <module name="Requester" />
       </profile>
     </annotationProcessing>
